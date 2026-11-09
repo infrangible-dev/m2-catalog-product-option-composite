@@ -10,9 +10,9 @@ define([
 ], function ($, domReady) {
     'use strict';
 
-    var selectionWidgetMixin = {
+    const selectionWidgetMixin = {
         _init: function() {
-            var self = this;
+            const self = this;
 
             self._super();
 
@@ -20,7 +20,7 @@ define([
                 $(self.options.productBundleTriggerSelector).on('bundle_product_options_composite_initialized', function(event, optionId) {
                     console.debug('bundle product options composite initialized for option with id: ' + optionId);
 
-                    var selectedProductIds = self.collectSelectedProductIds();
+                    const selectedProductIds = self.collectSelectedProductIds();
 
                     $(self.options.productBundleTriggerSelector).trigger('bundle_option_changed',
                         [optionId, selectedProductIds[optionId]]);

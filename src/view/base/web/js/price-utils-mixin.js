@@ -10,22 +10,21 @@ define([
 ], function ($, wrapper) {
     'use strict';
 
-    var mixin = {
+    const mixin = {
         findOptionId: function (originalFn, element) {
-            var re, id, name;
-
             if (! element) {
                 return;
             }
 
-            name = $(element).attr('name');
+            const name = $(element).attr('name');
 
-            var matches = (name.match(/\[([^\]]+)\]/g) || []).length;
+            const matches = (name.match(/\[([^\]]+)\]/g) || []).length;
 
             if (matches > 1) {
-                re = /\[([^\]]+)\]/g;
+                const re = /\[([^\]]+)\]/g;
 
-                var match;
+                let id;
+                let match;
                 while ((match = re.exec(name))) {
                     id = match[1];
                 }

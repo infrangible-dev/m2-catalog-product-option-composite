@@ -11,7 +11,7 @@ define([
 ], function ($, domReady) {
     'use strict';
 
-    var globalOptions = {
+    const globalOptions = {
         config: {},
         productBundleTriggerSelector: '.bundle-options-container',
         bundleOptionId: null
@@ -24,7 +24,7 @@ define([
         },
 
         _init: function() {
-            var self = this;
+            const self = this;
 
             domReady(function() {
                 $(self.options.productBundleTriggerSelector).on('bundle_option_changed', function (event, bundleOptionId, selectedProductIds) {
@@ -42,10 +42,10 @@ define([
         },
 
         handleAllowHide: function(selectedProductIds) {
-            var self = this;
+            const self = this;
 
             $.each(this.options.config.allowHideProductIds, function(optionId, optionData) {
-                var option = $('#product-option-' + optionId);
+                const option = $('#product-option-' + optionId);
 
                 self.handleAllowHideSelect(selectedProductIds, optionId, optionData, option);
                 self.handleAllowHideRadio(selectedProductIds, optionId, optionData, option);
@@ -55,9 +55,9 @@ define([
         },
 
         handleAllowHideSelect: function(selectedProductIds, optionId, optionData, option) {
-            var self = this;
+            const self = this;
 
-            var select = option.find('#select_' + optionId);
+            const select = option.find('#select_' + optionId);
 
             if (select.length > 0) {
                 console.debug('Found select for product option with id: ' + optionId);
@@ -73,14 +73,14 @@ define([
         },
 
         handleAllowHideSelectOptions: function(selectedProductIds, optionId, optionData, option, select) {
-            var self = this;
+            const self = this;
 
             if (optionData.values) {
-                var options = select.find('option');
+                const options = select.find('option');
 
                 $.each(optionData.values, function(optionValueId, productIds) {
                     options.each(function() {
-                        var option = $(this);
+                        const option = $(this);
 
                         self.updateOptionValueElement(selectedProductIds, option, optionValueId, productIds);
                     });
@@ -94,16 +94,16 @@ define([
         },
 
         handleAllowHideRadio: function(selectedProductIds, optionId, optionData, option) {
-            var self = this;
+            const self = this;
 
-            var radioButtons = option.find('input[type="radio"][name="options[' + optionId + ']"]');
+            const radioButtons = option.find('input[type="radio"][name="options[' + optionId + ']"]');
 
             if (radioButtons.length > 0) {
                 console.debug('Found radio buttons for product option with id: ' + optionId);
 
-                var noSelectionRadioButton;
+                let noSelectionRadioButton;
                 radioButtons.each(function(key, value) {
-                    var radioButton = $(value);
+                    const radioButton = $(value);
                     if (! radioButton.val()) {
                         noSelectionRadioButton = radioButton;
                     }
@@ -118,7 +118,7 @@ define([
 
                 if (optionData.values) {
                     radioButtons.each(function(key, value) {
-                        var radioButton = $(value);
+                        const radioButton = $(value);
                         self.handleAllowHideRadioButton(selectedProductIds, optionId, optionData, option, radioButton);
                     });
                     if (! self.updateOptionElement(option, radioButtons)) {
@@ -134,7 +134,7 @@ define([
         },
 
         handleAllowHideRadioButton: function(selectedProductIds, optionId, optionData, option, radioButton) {
-            var self = this;
+            const self = this;
 
             if (optionData.values) {
                 $.each(optionData.values, function(optionValueId, productIds) {
@@ -144,16 +144,16 @@ define([
         },
 
         handleAllowHideCheckbox: function(selectedProductIds, optionId, optionData, option) {
-            var self = this;
+            const self = this;
 
-            var checkboxButtons = option.find('input[type="checkbox"][name="options[' + optionId + '][]"]');
+            const checkboxButtons = option.find('input[type="checkbox"][name="options[' + optionId + '][]"]');
 
             if (checkboxButtons.length > 0) {
                 console.debug('Found checkbox buttons for product option with id: ' + optionId);
 
                 if (! self.handleAllowHideOption(selectedProductIds, optionData, option, optionId)) {
                     checkboxButtons.each(function(key, value) {
-                        var checkboxButton = $(value);
+                        const checkboxButton = $(value);
                         if (checkboxButton.is(':checked')) {
                             checkboxButton.prop('checked', false);
                             checkboxButton.trigger('change');
@@ -163,13 +163,13 @@ define([
 
                 if (optionData.values) {
                     checkboxButtons.each(function(key, value) {
-                        var checkboxButton = $(value);
+                        const checkboxButton = $(value);
                         self.handleAllowHideCheckboxButton(
                             selectedProductIds, optionId, optionData, option, checkboxButton);
                     });
                     if (! self.updateOptionElement(option, checkboxButtons)) {
                         checkboxButtons.each(function(key, value) {
-                            var checkboxButton = $(value);
+                            const checkboxButton = $(value);
                             if (checkboxButton.is(':checked')) {
                                 checkboxButton.prop('checked', false);
                                 checkboxButton.trigger('change');
@@ -183,7 +183,7 @@ define([
         },
 
         handleAllowHideCheckboxButton: function(selectedProductIds, optionId, optionData, option, checkboxButton) {
-            var self = this;
+            const self = this;
 
             if (optionData.values) {
                 $.each(optionData.values, function(optionValueId, productIds) {
@@ -193,7 +193,7 @@ define([
         },
 
         handleAllowHideProduct: function(selectedProductIds, optionId, optionData, option) {
-            var self = this;
+            const self = this;
 
             if (option.hasClass('field-wrapper-product')) {
                 console.debug('Found product for product option with id: ' + optionId);
@@ -210,15 +210,15 @@ define([
         },
 
         handleAllowHideOption: function(selectedProductIds, optionData, option, optionId) {
-            var self = this;
+            const self = this;
 
             if (option.length > 0) {
                 console.debug('Updating option with id: ' + optionId);
 
                 if (optionData.option) {
-                    var productIds = optionData.option;
+                    const productIds = optionData.option;
 
-                    var selected = self.isSelected(selectedProductIds, productIds);
+                    const selected = self.isSelected(selectedProductIds, productIds);
 
                     if (selected) {
                         console.debug('Showing option with id: ' + optionId);
@@ -236,7 +236,7 @@ define([
         },
 
         updateOptionElement: function(optionElement, optionValueElements) {
-            var availableOptionValues = 0;
+            let availableOptionValues = 0;
             optionValueElements.each(function() {
                 if ($(this).css('display') !== 'none' && $(this).val()) {
                     availableOptionValues++;
@@ -253,12 +253,12 @@ define([
         },
 
         updateOptionValueElement: function(selectedProductIds, optionValueElement, optionValueId, productIds) {
-            var self = this;
+            const self = this;
 
-            var optionValue = optionValueElement.val();
+            const optionValue = optionValueElement.val();
 
             if (optionValue === optionValueId) {
-                var selected = self.isSelected(selectedProductIds, productIds);
+                const selected = self.isSelected(selectedProductIds, productIds);
 
                 if (selected) {
                     optionValueElement.show();
@@ -273,10 +273,10 @@ define([
         },
 
         isSelected: function(selectedProductIds, productIds) {
-            var show = false;
+            let show = false;
 
             if (selectedProductIds) {
-                var isSubSelection = false;
+                let isSubSelection = false;
                 $.each(selectedProductIds, function(key, selectedProductId) {
                     if (Array.isArray(selectedProductId)) {
                         isSubSelection = true;
