@@ -2,7 +2,7 @@
     "name": "infrangible/m2-catalog-product-option-composite",
     "description": "Custom options for bundle and configurable products: tie options to variants or bundle selections, show them inside the bundle options and let customers edit them per bundle item in the cart.",
     "type": "magento2-module",
-    "version": "6.0.0",
+    "version": "6.0.1",
     "license": "MIT",
     "keywords": [
         "Magento",
@@ -25,7 +25,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.1",
         "fewedev/base": "~2.4.3",
         "infrangible/m2-bundle-option-selection": "~2.0.0",
         "infrangible/m2-bundle-option-wrapper": "~2.0.0",

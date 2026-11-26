@@ -8,7 +8,8 @@ const config = {
     map: {
         '*': {
             productOptionsComposite: 'Infrangible_CatalogProductOptionComposite/js/product-options-composite',
-            bundleProductOptionsComposite: 'Infrangible_CatalogProductOptionComposite/js/bundle-product-options-composite',
+            bundleProductOptionsComposite:
+                'Infrangible_CatalogProductOptionComposite/js/bundle-product-options-composite'
         }
     },
     config: {

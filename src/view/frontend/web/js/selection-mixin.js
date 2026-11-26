@@ -11,18 +11,20 @@ define([
     'use strict';
 
     const selectionWidgetMixin = {
-        _init: function() {
+        _init: function () {
             const self = this;
 
             self._super();
 
-            domReady(function() {
-                $(self.options.productBundleTriggerSelector).on('bundle_product_options_composite_initialized', function(event, optionId) {
-                    console.debug('bundle product options composite initialized for option with id: ' + optionId);
+            domReady(function () {
+                const triggerNode = $(self.options.productBundleTriggerSelector);
 
+                triggerNode.on('bundle_product_options_composite_initialized', function (event, optionId) {
                     const selectedProductIds = self.collectSelectedProductIds();
 
-                    $(self.options.productBundleTriggerSelector).trigger('bundle_option_changed',
+                    console.debug('bundle product options composite initialized for option with id: ' + optionId);
+
+                    triggerNode.trigger('bundle_option_changed',
                         [optionId, selectedProductIds[optionId]]);
                 });
             });

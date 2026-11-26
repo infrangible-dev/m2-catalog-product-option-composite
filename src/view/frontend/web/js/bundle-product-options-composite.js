@@ -18,14 +18,14 @@ define([
             bundleOptionId: null
         },
 
-        _init: function() {
+        _init: function () {
             const self = this;
 
-            domReady(function() {
+            domReady(function () {
                 const container = $(self.options.productBundleTriggerSelector);
 
-                container.on('bundle_option_changed', function(event, bundleOptionId, selectedProductIds) {
-                    if (parseInt(self.options.bundleOptionId) === parseInt(bundleOptionId) &&
+                container.on('bundle_option_changed', function (event, bundleOptionId, selectedProductIds) {
+                    if (parseInt(self.options.bundleOptionId, 10) === parseInt(bundleOptionId, 10) &&
                         selectedProductIds !== null && selectedProductIds !== undefined) {
 
                         self.handleAllowHide(

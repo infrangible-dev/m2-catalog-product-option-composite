@@ -20,25 +20,27 @@ define([
     $.widget('mage.productOptionsComposite', {
         options: globalOptions,
 
-        _init: function() {
+        _init: function () {
             const self = this;
 
-            domReady(function() {
-                $(self.options.productTriggerSelector).on('swatch.changed bundle_changed', function (event, selectedProductIds) {
+            domReady(function () {
+                const triggerNode = $(self.options.productTriggerSelector);
+
+                triggerNode.on('swatch.changed bundle_changed', function (event, selectedProductIds) {
                     if (selectedProductIds !== null && selectedProductIds !== undefined) {
                         self.handleAllowHide(
                             Array.isArray(selectedProductIds) ? selectedProductIds : [selectedProductIds]);
                     }
                 });
 
-                $(self.options.productTriggerSelector).trigger('product_options_composite_initialized');
+                triggerNode.trigger('product_options_composite_initialized');
             });
         },
 
-        handleAllowHide: function(selectedProductIds) {
+        handleAllowHide: function (selectedProductIds) {
             const self = this;
 
-            $.each(this.options.config.allowHideProductIds || {}, function(optionId, optionData) {
+            $.each(this.options.config.allowHideProductIds || {}, function (optionId, optionData) {
                 const option = $('#product-option-' + optionId);
 
                 self.handleAllowHideSelect(selectedProductIds, optionId, optionData, option);
@@ -49,16 +51,15 @@ define([
             });
         },
 
-        handleAllowHideOther: function(selectedProductIds, optionId, optionData, option) {
-            const self = this;
-
-            const handled = option.find('#select_' + optionId).length > 0 ||
+        handleAllowHideOther: function (selectedProductIds, optionId, optionData, option) {
+            const self = this,
+                handled = option.find('#select_' + optionId).length > 0 ||
                 option.find('input[type="radio"][name="options[' + optionId + ']"]').length > 0 ||
                 option.find('input[type="checkbox"][name="options[' + optionId + '][]"]').length > 0 ||
                 option.hasClass('field-wrapper-product');
 
-            if (! handled && optionData.option && ! self.handleAllowHideOption(selectedProductIds, optionData, option)) {
-                option.find('input, textarea, select').each(function() {
+            if (!handled && optionData.option && !self.handleAllowHideOption(selectedProductIds, optionData, option)) {
+                option.find('input, textarea, select').each(function () {
                     const field = $(this);
 
                     if (field.val()) {
@@ -69,13 +70,12 @@ define([
             }
         },
 
-        handleAllowHideSelect: function(selectedProductIds, optionId, optionData, option) {
-            const self = this;
-
-            const select = option.find('#select_' + optionId);
+        handleAllowHideSelect: function (selectedProductIds, optionId, optionData, option) {
+            const self = this,
+                select = option.find('#select_' + optionId);
 
             if (select.length > 0) {
-                if (! self.handleAllowHideOption(selectedProductIds, optionData, option)) {
+                if (!self.handleAllowHideOption(selectedProductIds, optionData, option)) {
                     select.val('');
                     select.trigger('change');
                 }
@@ -83,119 +83,129 @@ define([
             }
         },
 
-        handleAllowHideSelectOptions: function(selectedProductIds, optionId, optionData, option, select) {
+        handleAllowHideSelectOptions: function (selectedProductIds, optionId, optionData, option, select) {
             const self = this;
 
             if (optionData.values) {
                 const options = select.find('option');
 
-                $.each(optionData.values, function(optionValueId, productIds) {
-                    options.each(function() {
-                        const option = $(this);
-
-                        self.updateOptionValueElement(selectedProductIds, option, optionValueId, productIds);
+                $.each(optionData.values, function (optionValueId, productIds) {
+                    options.each(function () {
+                        self.updateOptionValueElement(selectedProductIds, $(this), optionValueId, productIds);
                     });
                 });
 
-                if (! self.updateOptionElement(option, options)) {
+                if (!self.updateOptionElement(option, options)) {
                     select.val('');
                     select.trigger('change');
                 }
             }
         },
 
-        handleAllowHideRadio: function(selectedProductIds, optionId, optionData, option) {
-            const self = this;
+        handleAllowHideRadio: function (selectedProductIds, optionId, optionData, option) {
+            const self = this,
+                radioButtons = option.find('input[type="radio"][name="options[' + optionId + ']"]');
+            let noSelectionRadioButton;
 
-            const radioButtons = option.find('input[type="radio"][name="options[' + optionId + ']"]');
+            if (radioButtons.length === 0) {
+                return;
+            }
 
-            if (radioButtons.length > 0) {
-                let noSelectionRadioButton;
-                radioButtons.each(function(key, value) {
-                    const radioButton = $(value);
-                    if (! radioButton.val()) {
-                        noSelectionRadioButton = radioButton;
-                    }
+            radioButtons.each(function (key, value) {
+                const radioButton = $(value);
+
+                if (!radioButton.val()) {
+                    noSelectionRadioButton = radioButton;
+                }
+            });
+
+            if (!self.handleAllowHideOption(selectedProductIds, optionData, option)) {
+                self.checkRadioButton(noSelectionRadioButton);
+            }
+
+            if (optionData.values) {
+                radioButtons.each(function (key, value) {
+                    self.handleAllowHideRadioButton(selectedProductIds, optionId, optionData, option, $(value));
                 });
 
-                if (! self.handleAllowHideOption(selectedProductIds, optionData, option)) {
-                    if (noSelectionRadioButton && ! noSelectionRadioButton.is(':checked')) {
-                        noSelectionRadioButton.prop('checked', true);
-                        noSelectionRadioButton.trigger('change');
-                    }
-                }
-
-                if (optionData.values) {
-                    radioButtons.each(function(key, value) {
-                        const radioButton = $(value);
-                        self.handleAllowHideRadioButton(selectedProductIds, optionId, optionData, option, radioButton);
-                    });
-                    if (! self.updateOptionElement(option, radioButtons)) {
-                        if (noSelectionRadioButton && ! noSelectionRadioButton.is(':checked')) {
-                            noSelectionRadioButton.prop('checked', true);
-                            noSelectionRadioButton.trigger('change');
-                        }
-                    }
+                if (!self.updateOptionElement(option, radioButtons)) {
+                    self.checkRadioButton(noSelectionRadioButton);
                 }
             }
         },
 
-        handleAllowHideRadioButton: function(selectedProductIds, optionId, optionData, option, radioButton) {
+        /**
+         * Checks the radio button, if it exists and is not checked yet.
+         *
+         * @param {jQuery|undefined} radioButton
+         */
+        checkRadioButton: function (radioButton) {
+            if (radioButton && !radioButton.is(':checked')) {
+                radioButton.prop('checked', true);
+                radioButton.trigger('change');
+            }
+        },
+
+        handleAllowHideRadioButton: function (selectedProductIds, optionId, optionData, option, radioButton) {
             const self = this;
 
             if (optionData.values) {
-                $.each(optionData.values, function(optionValueId, productIds) {
+                $.each(optionData.values, function (optionValueId, productIds) {
                     self.updateOptionValueElement(selectedProductIds, radioButton, optionValueId, productIds);
                 });
             }
         },
 
-        handleAllowHideCheckbox: function(selectedProductIds, optionId, optionData, option) {
-            const self = this;
+        handleAllowHideCheckbox: function (selectedProductIds, optionId, optionData, option) {
+            const self = this,
+                checkboxButtons = option.find('input[type="checkbox"][name="options[' + optionId + '][]"]');
 
-            const checkboxButtons = option.find('input[type="checkbox"][name="options[' + optionId + '][]"]');
+            if (checkboxButtons.length === 0) {
+                return;
+            }
 
-            if (checkboxButtons.length > 0) {
-                if (! self.handleAllowHideOption(selectedProductIds, optionData, option)) {
-                    checkboxButtons.each(function(key, value) {
-                        const checkboxButton = $(value);
-                        if (checkboxButton.is(':checked')) {
-                            checkboxButton.prop('checked', false);
-                            checkboxButton.trigger('change');
-                        }
-                    });
-                }
+            if (!self.handleAllowHideOption(selectedProductIds, optionData, option)) {
+                self.uncheckCheckboxes(checkboxButtons);
+            }
 
-                if (optionData.values) {
-                    checkboxButtons.each(function(key, value) {
-                        const checkboxButton = $(value);
-                        self.handleAllowHideCheckboxButton(
-                            selectedProductIds, optionId, optionData, option, checkboxButton);
-                    });
-                    if (! self.updateOptionElement(option, checkboxButtons)) {
-                        checkboxButtons.each(function(key, value) {
-                            const checkboxButton = $(value);
-                            if (checkboxButton.is(':checked')) {
-                                checkboxButton.prop('checked', false);
-                                checkboxButton.trigger('change');
-                            }
-                        });
-                    }
+            if (optionData.values) {
+                checkboxButtons.each(function (key, value) {
+                    self.handleAllowHideCheckboxButton(selectedProductIds, optionId, optionData, option, $(value));
+                });
+
+                if (!self.updateOptionElement(option, checkboxButtons)) {
+                    self.uncheckCheckboxes(checkboxButtons);
                 }
             }
         },
 
-        handleAllowHideCheckboxButton: function(selectedProductIds, optionId, optionData, option, checkboxButton) {
+        /**
+         * Unchecks the checked checkboxes.
+         *
+         * @param {jQuery} checkboxButtons
+         */
+        uncheckCheckboxes: function (checkboxButtons) {
+            checkboxButtons.each(function (key, value) {
+                const checkboxButton = $(value);
+
+                if (checkboxButton.is(':checked')) {
+                    checkboxButton.prop('checked', false);
+                    checkboxButton.trigger('change');
+                }
+            });
+        },
+
+        handleAllowHideCheckboxButton: function (selectedProductIds, optionId, optionData, option, checkboxButton) {
             const self = this;
 
             if (optionData.values) {
-                $.each(optionData.values, function(optionValueId, productIds) {
+                $.each(optionData.values, function (optionValueId, productIds) {
                     self.updateOptionValueElement(selectedProductIds, checkboxButton, optionValueId, productIds);
                 });
             }
         },
 
-        handleAllowHideProduct: function(selectedProductIds, optionId, optionData, option) {
+        handleAllowHideProduct: function (selectedProductIds, optionId, optionData, option) {
             const self = this;
 
             if (option.hasClass('field-wrapper-product')) {
@@ -208,27 +218,27 @@ define([
             }
         },
 
-        handleAllowHideOption: function(selectedProductIds, optionData, option) {
+        handleAllowHideOption: function (selectedProductIds, optionData, option) {
             const self = this;
 
             if (optionData.option) {
-                const productIds = optionData.option;
-
-                const selected = self.isSelected(selectedProductIds, productIds);
+                const productIds = optionData.option,
+                    selected = self.isSelected(selectedProductIds, productIds);
 
                 if (selected) {
                     option.show();
                     return true;
-                } else {
-                    option.hide();
-                    return false;
                 }
+                option.hide();
+                return false;
+
             }
         },
 
-        updateOptionElement: function(optionElement, optionValueElements) {
+        updateOptionElement: function (optionElement, optionValueElements) {
             let availableOptionValues = 0;
-            optionValueElements.each(function() {
+
+            optionValueElements.each(function () {
                 if ($(this).css('display') !== 'none' && $(this).val()) {
                     availableOptionValues++;
                 }
@@ -237,16 +247,15 @@ define([
             if (availableOptionValues === 0) {
                 optionElement.hide();
                 return false;
-            } else {
-                optionElement.show();
-                return true;
             }
+            optionElement.show();
+            return true;
+
         },
 
-        updateOptionValueElement: function(selectedProductIds, optionValueElement, optionValueId, productIds) {
-            const self = this;
-
-            const optionValue = optionValueElement.val();
+        updateOptionValueElement: function (selectedProductIds, optionValueElement, optionValueId, productIds) {
+            const self = this,
+                optionValue = optionValueElement.val();
 
             if (optionValue === optionValueId) {
                 const selected = self.isSelected(selectedProductIds, productIds);
@@ -263,23 +272,24 @@ define([
             }
         },
 
-        isSelected: function(selectedProductIds, productIds) {
+        isSelected: function (selectedProductIds, productIds) {
             const self = this;
 
             let show = false;
 
             if (selectedProductIds) {
                 let isSubSelection = false;
-                $.each(selectedProductIds, function(key, selectedProductId) {
+
+                $.each(selectedProductIds, function (key, selectedProductId) {
                     if (Array.isArray(selectedProductId)) {
                         isSubSelection = true;
                     }
                 });
 
                 if (isSubSelection) {
-                    $.each(selectedProductIds, function(groupId, selectedProductIdsList) {
+                    $.each(selectedProductIds, function (groupId, selectedProductIdsList) {
                         if (selectedProductIdsList && productIds[groupId]) {
-                            $.each(selectedProductIdsList, function(key, selectedProductId) {
+                            $.each(selectedProductIdsList, function (key, selectedProductId) {
                                 if (self.containsProductId(productIds[groupId], selectedProductId)) {
                                     show = true;
                                 }
@@ -287,7 +297,7 @@ define([
                         }
                     });
                 } else {
-                    $.each(selectedProductIds, function(key, selectedProductId) {
+                    $.each(selectedProductIds, function (key, selectedProductId) {
                         if (self.containsProductId(productIds, selectedProductId)) {
                             show = true;
                         }
@@ -298,7 +308,7 @@ define([
             return show;
         },
 
-        containsProductId: function(productIds, productId) {
+        containsProductId: function (productIds, productId) {
             return $.map(productIds, String).indexOf(String(productId)) !== -1;
         }
     });
