@@ -49,21 +49,20 @@ class CartTest extends TestCase
     }
 
     /**
-     * Returns a selection of a bundle option.
+     * Returns a selection of bundle option 3.
      *
-     * @param int $bundleOptionId
      * @param int $selectionId
      * @param int $productId
      *
      * @return Product
      * @throws ReflectionException
      */
-    private function createSelection(int $bundleOptionId, int $selectionId, int $productId): Product
+    private function createSelection(int $selectionId, int $productId): Product
     {
         return $this->createModel(
             Product::class,
             'entity_id',
-            ['entity_id' => (string)$productId, 'option_id' => $bundleOptionId, 'selection_id' => $selectionId]
+            ['entity_id' => (string)$productId, 'option_id' => 3, 'selection_id' => $selectionId]
         );
     }
 
@@ -78,7 +77,7 @@ class CartTest extends TestCase
     {
         $typeInstance = $this->createStub(Type::class);
         $typeInstance->method('getSelectionsCollection')->willReturn(
-            [$this->createSelection(3, 7, 5), $this->createSelection(3, 8, 6)]
+            [$this->createSelection(7, 5), $this->createSelection(8, 6)]
         );
 
         $product = $this->createStub(Product::class);

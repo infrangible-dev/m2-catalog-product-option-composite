@@ -74,27 +74,19 @@ class DataTest extends TestCase
     }
 
     /**
-     * Returns a new configurable item with children of the products.
-     *
-     * @param int[] $childProductIds
+     * Returns a new item of configurable product 10 with a child of product 11.
      *
      * @return Item
      */
-    private function createConfigurableItem(array $childProductIds): Item
+    private function createConfigurableItem(): Item
     {
-        $children = [];
-
-        foreach ($childProductIds as $childProductId) {
-            $child = $this->createStub(Item::class);
-            $child->method('getProduct')->willReturn($this->createProduct($childProductId));
-
-            $children[] = $child;
-        }
+        $child = $this->createStub(Item::class);
+        $child->method('getProduct')->willReturn($this->createProduct(11));
 
         $item = $this->createStub(Item::class);
         $item->method('getId')->willReturn(null);
         $item->method('getProduct')->willReturn($this->createProduct(10, Configurable::TYPE_CODE));
-        $item->method('getChildren')->willReturn($children);
+        $item->method('getChildren')->willReturn([$child]);
 
         return $item;
     }
@@ -150,7 +142,7 @@ class DataTest extends TestCase
      */
     public function testGetCompositeProductIdsOfConfigurableItem(): void
     {
-        $this->assertSame(['11'], $this->createHelper()->getCompositeProductIds($this->createConfigurableItem([11])));
+        $this->assertSame(['11'], $this->createHelper()->getCompositeProductIds($this->createConfigurableItem()));
     }
 
     /**
@@ -162,7 +154,7 @@ class DataTest extends TestCase
     public function testIsProductOptionAvailableForItem(): void
     {
         $helper = $this->createHelper();
-        $item = $this->createConfigurableItem([11]);
+        $item = $this->createConfigurableItem();
 
         $this->assertTrue($helper->isProductOptionAvailableForItem($this->createOption(null), $item));
         $this->assertTrue($helper->isProductOptionAvailableForItem($this->createOption('11,12'), $item));
