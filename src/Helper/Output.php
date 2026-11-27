@@ -165,7 +165,7 @@ class Output
      */
     private function getBundleProduct(Option $bundleOption): ?Product
     {
-        $productId = $bundleOption->getParentId();
+        $productId = $bundleOption->getData('parent_id');
 
         if (! is_numeric($productId)) {
             return null;

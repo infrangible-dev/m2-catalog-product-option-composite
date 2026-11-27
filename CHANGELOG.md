@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.0.2
+
+### Changed
+
+- The parent item of quote items and the parent product of bundle options are read with `getData()` and the column
+  names instead of magic methods.
+
 ## 6.0.1
 
 ### Changed

@@ -412,7 +412,7 @@ class Data
         $childItems = [];
 
         foreach ($item->getQuote()->getAllItems() as $quoteItem) {
-            if ($quoteItem instanceof Item && $quoteItem->getParentItemId() == $itemId) {
+            if ($quoteItem instanceof Item && $quoteItem->getData('parent_item_id') == $itemId) {
                 $childItems[] = $quoteItem;
             }
         }
